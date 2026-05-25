@@ -207,7 +207,7 @@ class pypi_upload(Task):
 class test(Task):
     """Run the full test suite."""
     def make(self):
-        run_in_dir("python test.py", join(dirname(__file__), "test"))
+        sh.run_in_dir("python test.py", join(dirname(__file__), "test"))
         #TODO: consider adding Task.top (dir holding Makefile.py)
 
 
