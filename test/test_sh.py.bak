@@ -21,13 +21,13 @@ class Error(Exception):
 #---- internal support routines
 
 def _getumask():
-    oldumask = os.umask(0o77)
+    oldumask = os.umask(077)
     os.umask(oldumask)
     return oldumask
 
 def _run(cmd):
     DEBUG = False
-    if DEBUG: print("running '%s'" % cmd)
+    if DEBUG: print "running '%s'" % cmd
     if DEBUG:
         redirect = ""
     elif sys.platform == "win32":
@@ -82,30 +82,30 @@ class CpTestCase(unittest.TestCase):
 
     def assertFile(self, path, content=None, mode=None, mtime=None,
                    atime=None):
-        self.assertFalse(not os.path.isfile(path))
+        self.failIf(not os.path.isfile(path))
         if content is not None:
-            self.assertFalse(_read(path) != content)
+            self.failIf(_read(path) != content)
         if mode is not None:
             actual_mode = stat.S_IMODE(os.stat(path).st_mode)
-            self.assertFalse(actual_mode != mode,
+            self.failIf(actual_mode != mode,
                         "file '%s' does not have the expected mode: "
                         "expected=%s, actual=%s"
                         % (path, oct(mode), oct(actual_mode)))
         if mtime is not None:
             actual_mtime = os.stat(path).st_mtime
-            self.assertFalse(actual_mtime != mtime,
+            self.failIf(actual_mtime != mtime,
                         "file '%s' does not have the expected mtime: "
                         "expected=%s, actual=%s"
                         % (path, mtime, actual_mtime))
         if atime is not None:
             actual_atime = os.stat(path).st_atime
-            self.assertFalse(actual_atime != atime,
+            self.failIf(actual_atime != atime,
                         "file '%s' does not have the expected atime: "
                         "expected=%s, actual=%s"
                         % (path, atime, actual_atime))
 
     def assertDir(self, path, files=None, mode=None, mtime=None, atime=None):
-        self.assertFalse(not os.path.isdir(path))
+        self.failIf(not os.path.isdir(path))
         if files is not None:
             actual_files = os.listdir(path)
             actual_files.sort()
@@ -113,24 +113,24 @@ class CpTestCase(unittest.TestCase):
             if sys.platform == "win32":
                 actual_files = [f.lower() for f in actual_files]
                 files = [f.lower() for f in files]
-            self.assertFalse(actual_files != files,
+            self.failIf(actual_files != files,
                         "directory '%s' does not contain the expected files: "
                         "expected=%r, actual=%r" % (path, files, actual_files))
         if mode is not None:
             actual_mode = stat.S_IMODE(os.stat(path).st_mode)
-            self.assertFalse(actual_mode != mode,
+            self.failIf(actual_mode != mode,
                         "directory '%s' does not have the expected mode: "
                         "expected=%s, actual=%s"
                         % (path, oct(mode), oct(actual_mode)))
         if mtime is not None:
             actual_mtime = os.stat(path).st_mtime
-            self.assertFalse(actual_mtime != mtime,
+            self.failIf(actual_mtime != mtime,
                         "directory '%s' does not have the expected mtime: "
                         "expected=%s, actual=%s"
                         % (path, mtime, actual_mtime))
         if atime is not None:
             actual_atime = os.stat(path).st_atime
-            self.assertFalse(actual_atime != atime,
+            self.failIf(actual_atime != atime,
                         "directory '%s' does not have the expected atime: "
                         "expected=%s, actual=%s"
                         % (path, atime, actual_atime))
@@ -244,13 +244,13 @@ class CpTestCase(unittest.TestCase):
             from mklib.sh import cp
             os.mkdir("dira")
             os.mkdir("dirb")
-            os.chmod("dirb", 0o666)
+            os.chmod("dirb", 0666)
             try:
                 self.assertRaises(OSError, cp, "dira", "dirb", recursive=True)
             finally:
                 # Have to do this because HP-UX 11's `chmod -R` can't
                 # handle it.
-                os.chmod("dirb", 0o777)
+                os.chmod("dirb", 0777)
 
         def test_permissions(self):
             # Test nitpicky permissions on a simple copy:
@@ -260,39 +260,39 @@ class CpTestCase(unittest.TestCase):
             a = "filea"
             b = "fileb"
 
-            old_umask = os.umask(0o22)
+            old_umask = os.umask(022)
             try:
                 # - before: filea (-rw-r--r--), no fileb, umask=0022
                 #   action: cp filea fileb
                 #   after:  filea (-rw-r--r--), fileb (-rw-r--r--)
                 _write(a, "filea's content")
-                os.chmod(a, 0o644)
+                os.chmod(a, 0644)
                 cp(a, b)
-                self.assertFile(b, mode=0o644)
+                self.assertFile(b, mode=0644)
 
                 # - before: filea (-rwxrwxrwx), no fileb, umask=0022
                 #   action: cp filea fileb
                 #   after:  filea (-rwxrwxrwx), fileb (-rwxr-xr-x)
                 os.remove(b)
-                os.chmod(a, 0o777)
+                os.chmod(a, 0777)
                 cp(a, b)
-                self.assertFile(b, mode=0o755)
+                self.assertFile(b, mode=0755)
 
                 # - before: filea (-rw-r--r--), fileb (-rwxrwxrwx), umask=0022
                 #   action: cp filea fileb
                 #   after:  filea (-rw-r--r--), fileb (-rwxrwxrwx)
-                os.chmod(a, 0o644)
-                os.chmod(b, 0o777)
+                os.chmod(a, 0644)
+                os.chmod(b, 0777)
                 cp(a, b)
-                self.assertFile(b, mode=0o777)
+                self.assertFile(b, mode=0777)
 
                 # - before: filea (-rwxrwxrwx), fileb (--w-------), umask=0022
                 #   action: cp filea fileb
                 #   after:  filea (-rwxrwxrwx), fileb (--w-------)
-                os.chmod(a, 0o777)
-                os.chmod(b, 0o200)
+                os.chmod(a, 0777)
+                os.chmod(b, 0200)
                 cp(a, b)
-                self.assertFile(b, mode=0o200)
+                self.assertFile(b, mode=0200)
             finally:
                 os.umask(old_umask)
 
@@ -301,17 +301,17 @@ class CpTestCase(unittest.TestCase):
         a = "filea"; b = "fileb"
         _write(a, "this is filea")
         a_stat = os.stat(a)
-        os.chmod(a, 0o777)
+        os.chmod(a, 0777)
         cp(a, b, preserve=True)
         self.assertFile(b, mtime=a_stat.st_mtime, atime=a_stat.st_atime)
         if sys.platform != "win32":
-            self.assertFile(b, mode=0o777)
+            self.assertFile(b, mode=0777)
 
-        os.chmod(a, 0o700)
+        os.chmod(a, 0700)
         cp(a, b, preserve=True)
         self.assertFile(b, mtime=a_stat.st_mtime, atime=a_stat.st_atime)
         if sys.platform != "win32":
-            self.assertFile(b, mode=0o700)
+            self.assertFile(b, mode=0700)
 
     def test_no_preserve(self):
         from mklib.sh import cp
@@ -334,9 +334,9 @@ class CpTestCase(unittest.TestCase):
             a = "dira"; b = "dirb"
             os.mkdir(a)
             a_stat = os.stat(a)
-            os.chmod(a, 0o777)
+            os.chmod(a, 0777)
             cp(a, b, recursive=True, preserve=True)
-            self.assertDir(b, mode=0o777, mtime=a_stat.st_mtime,
+            self.assertDir(b, mode=0777, mtime=a_stat.st_mtime,
                            atime=a_stat.st_atime)
 
     if sys.platform == "win32":
@@ -404,7 +404,7 @@ class CpTestCase(unittest.TestCase):
             finally:
                 # Have to do this because HP-UX 11's `chmod -R` can't
                 # handle it.
-                os.chmod("noaccess", 0o777)
+                os.chmod("noaccess", 0777)
 
     def test_trailing_slashes(self):
         from mklib.sh import cp
@@ -454,26 +454,26 @@ class CpTestCase(unittest.TestCase):
             exc_pattern = None
 
         argv = [repr(a) for a in args]\
-               + ["%s=%r" % (k,v)  for k,v in list(kwargs.items())]
+               + ["%s=%r" % (k,v)  for k,v in kwargs.items()]
         callsig = "%s(%s)" % (callable.__name__, ", ".join(argv))
 
         try:
             callable(*args, **kwargs)
-        except exception as exc:
+        except exception, exc:
             if exc_args is not None:
-                self.assertFalse(exc.args != exc_args,
+                self.failIf(exc.args != exc_args,
                             "%s raised %s with unexpected args: "\
                             "expected=%r, actual=%r"\
                             % (callsig, exc.__class__, exc_args, exc.args))
             if exc_pattern is not None:
-                self.assertTrue(exc_pattern.search(str(exc)),
+                self.failUnless(exc_pattern.search(str(exc)),
                                 "%s raised %s, but the exception "\
                                 "does not match '%s': %r"\
                                 % (callsig, exc.__class__, exc_pattern.pattern,
                                    str(exc)))
         except:
             exc_info = sys.exc_info()
-            print(exc_info)
+            print exc_info
             self.fail("%s raised an unexpected exception type: "\
                       "expected=%s, actual=%s"\
                       % (callsig, exception, exc_info[0]))

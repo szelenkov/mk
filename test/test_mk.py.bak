@@ -131,8 +131,8 @@ def _dedentlines(lines, tabsize=8, skip_first_line=False):
     """
     DEBUG = False
     if DEBUG: 
-        print("dedent: dedent(..., tabsize=%d, skip_first_line=%r)"\
-              % (tabsize, skip_first_line))
+        print "dedent: dedent(..., tabsize=%d, skip_first_line=%r)"\
+              % (tabsize, skip_first_line)
     indents = []
     margin = None
     for i, line in enumerate(lines):
@@ -149,12 +149,12 @@ def _dedentlines(lines, tabsize=8, skip_first_line=False):
                 break
         else:
             continue # skip all-whitespace lines
-        if DEBUG: print("dedent: indent=%d: %r" % (indent, line))
+        if DEBUG: print "dedent: indent=%d: %r" % (indent, line)
         if margin is None:
             margin = indent
         else:
             margin = min(margin, indent)
-    if DEBUG: print("dedent: margin=%r" % margin)
+    if DEBUG: print "dedent: margin=%r" % margin
 
     if margin is not None and margin > 0:
         for i, line in enumerate(lines):
@@ -166,7 +166,7 @@ def _dedentlines(lines, tabsize=8, skip_first_line=False):
                 elif ch == '\t':
                     removed += tabsize - (removed % tabsize)
                 elif ch in '\r\n':
-                    if DEBUG: print("dedent: %r: EOL -> strip up to EOL" % line)
+                    if DEBUG: print "dedent: %r: EOL -> strip up to EOL" % line
                     lines[i] = lines[i][j:]
                     break
                 else:
@@ -174,8 +174,8 @@ def _dedentlines(lines, tabsize=8, skip_first_line=False):
                                      "line %r while removing %d-space margin"
                                      % (ch, line, margin))
                 if DEBUG:
-                    print("dedent: %r: %r -> removed %d/%d"\
-                          % (line, ch, removed, margin))
+                    print "dedent: %r: %r -> removed %d/%d"\
+                          % (line, ch, removed, margin)
                 if removed == margin:
                     lines[i] = lines[i][j+1:]
                     break
@@ -241,7 +241,7 @@ def _escaped_text_from_text(text, escapes="eol"):
     # - Add _escaped_html_from_text() with a similar call sig.
     import re
     
-    if isinstance(escapes, str):
+    if isinstance(escapes, basestring):
         if escapes == "eol":
             escapes = {'\r\n': "\\r\\n\r\n", '\n': "\\n\n", '\r': "\\r\r"}
         elif escapes == "whitespace":
@@ -256,7 +256,7 @@ def _escaped_text_from_text(text, escapes="eol"):
 
     # Sort longer replacements first to allow, e.g. '\r\n' to beat '\r' and
     # '\n'.
-    escapes_keys = list(escapes.keys())
+    escapes_keys = escapes.keys()
     escapes_keys.sort(key=lambda a: len(a), reverse=True)
     def repl(match):
         val = escapes[match.group(0)]

@@ -3,4 +3,4 @@ class answer(Task):
     default = True
     deps = ["answer.txt"]
     def make(self):
-        print "do answer"
+        print("do answer")

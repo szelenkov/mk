@@ -134,7 +134,7 @@ class Profile(ConfigVar):
 
     def __init__(self, profile_dirs):
         ConfigVar.__init__(self)
-        assert not isinstance(profile_dirs, str) # common mistake
+        assert not isinstance(profile_dirs, basestring) # common mistake
         self.profile_dirs = profile_dirs
         self.profile_path_from_name = dict(   # the available profiles
             (splitext(basename(f))[0], f)
@@ -145,7 +145,7 @@ class Profile(ConfigVar):
     def add_options(self, optparser):
         optparser.add_option("-p", "--profile",
             help="load one of the following configuration profiles (%s)"
-                 % ', '.join(list(self.profile_path_from_name.keys())))
+                 % ', '.join(self.profile_path_from_name.keys()))
 
     def _load_profile(self, profile_path, platname):
         log.debug("loading profile '%s'", profile_path)
@@ -181,7 +181,7 @@ class Profile(ConfigVar):
                 "profile '%s' is not one of the available "
                 "ones (%s), nor is it an existing path"
                 % (options.profile,
-                   ', '.join(list(self.profile_path_from_name.keys()))))
+                   ', '.join(self.profile_path_from_name.keys())))
         
         platname = config_var_from_name["target_plat"].value.name()
         self.profile_args = self._load_profile(self.profile_path, platname)

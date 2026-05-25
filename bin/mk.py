@@ -1,4 +1,4 @@
-#!python25.dll
+#!/usr/bin/env python3
 # 'mk' launch stuff for Windows (see http://effbot.org/zone/exemaker.htm)
 try:
     from mklib import runner

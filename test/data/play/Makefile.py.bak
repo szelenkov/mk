@@ -7,7 +7,7 @@ class a(Task):
     results = "foo bar".split()
     def make(self):
         for result in self.results:
-            print("touch %s" % relpath(result.path))
+            print "touch %s" % relpath(result.path)
 
 class b(File):
     path = "foo"

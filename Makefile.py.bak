@@ -57,7 +57,7 @@ class cut_a_release(Task):
             if answer != "yes":
                 self.log.info("user abort")
                 return
-            print("* * *")
+            print "* * *"
         self.log.info("cutting a %s release", version)
 
         # Checks: Ensure there is a section in changes for this version.
@@ -78,7 +78,7 @@ class cut_a_release(Task):
             if answer != "no":
                 self.log.info("abort")
                 return
-            print("* * *")
+            print "* * *"
         top_body = changes_sections[0][2]
         if top_body.strip() == "(nothing yet)":
             raise MkError("top section body is `(nothing yet)': it looks like "
@@ -238,10 +238,10 @@ def query_yes_no(question, default="yes"):
 
     while 1:
         sys.stdout.write(question + prompt)
-        choice = input().lower()
+        choice = raw_input().lower()
         if default is not None and choice == '':
             return default
-        elif choice in list(valid.keys()):
+        elif choice in valid.keys():
             return valid[choice]
         else:
             sys.stdout.write("Please respond with 'yes' or 'no' "\
