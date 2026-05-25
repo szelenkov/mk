@@ -52,8 +52,6 @@ except NameError:
 
 # Universal newline support
 _textmode = 'r'
-if hasattr(file, 'newlines'):
-    _textmode = 'U'
 
 
 class path(_base):
@@ -395,7 +393,7 @@ class path(_base):
 
     def open(self, mode='r'):
         """ Open this file.  Return a file object. """
-        return file(self, mode)
+        return open(_base(self), mode)
 
     def bytes(self):
         """ Open this file, read all bytes, return them as a string. """
